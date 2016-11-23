@@ -3,10 +3,11 @@
 case "$PRODUCT_NAME" in
   "tulip_chiphd_atv")
     echo "Overwriting Android TV product name..."
-    export PRODUCT_MODEL=fugu
-    export PRODUCT_NAME=fugu
-    export PRODUCT_BRAND=Android
-    export TARGET_DEVICE=fugu
+    export PRODUCT_MODEL=MIBOX3
+    export PRODUCT_NAME=once
+    export PRODUCT_BRAND=Xiaomi
+    export TARGET_DEVICE=once
+    export TARGET_BOOTLOADER_BOARD_NAME=once
     ;;
 esac
 
