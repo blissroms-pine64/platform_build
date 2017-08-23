@@ -591,6 +591,7 @@ def UnzipTemp(filename, pattern=None):
   OPTIONS.tempfiles.append(tmp)
 
   def unzip_to_dir(filename, dirname):
+    subprocess.call(["rm", "-rf", dirname + filename, "targetfiles-*"])
     cmd = ["unzip", "-o", "-q", filename, "-d", dirname]
     if pattern is not None:
       cmd.append(pattern)
@@ -1396,15 +1397,11 @@ class BlockDifference(object):
   def WriteScript(self, script, output_zip, progress=None):
     if not self.src:
       # write the output unconditionally
-      script.Print("Patching %s image unconditionally..." % (self.partition,))
-    else:
-      script.Print("Patching %s image after verification." % (self.partition,))
-
+      script.Print(" ")
+      script.Print("Flashing Bliss System files...")
     if progress:
       script.ShowProgress(progress, 0)
     self._WriteUpdate(script, output_zip)
-    if OPTIONS.verify:
-      self._WritePostInstallVerifyScript(script)
 
   def WriteStrictVerifyScript(self, script):
     """Verify all the blocks in the care_map, including clobbered blocks.
@@ -1508,7 +1505,7 @@ class BlockDifference(object):
 
   def _WritePostInstallVerifyScript(self, script):
     partition = self.partition
-    script.Print('Verifying the updated %s image...' % (partition,))
+    #script.Print('Verifying the updated %s image...' % (partition,))
     # Unlike pre-install verification, clobbered_blocks should not be ignored.
     ranges = self.tgt.care_map
     ranges_str = ranges.to_string_raw()
@@ -1523,18 +1520,16 @@ class BlockDifference(object):
       script.AppendExtra('if range_sha1("%s", "%s") == "%s" then' % (
                          self.device, ranges_str,
                          self._HashZeroBlocks(self.tgt.extended.size())))
-      script.Print('Verified the updated %s image.' % (partition,))
-      if partition == "system":
-        code = ErrorCode.SYSTEM_NONZERO_CONTENTS
-      else:
-        code = ErrorCode.VENDOR_NONZERO_CONTENTS
+      script.Print(" ")
+      script.Print("Verified Bliss System files...")
       script.AppendExtra(
           'else\n'
           '  abort("E%d: %s partition has unexpected non-zero contents after '
           'OTA update");\n'
           'endif;' % (code, partition))
     else:
-      script.Print('Verified the updated %s image.' % (partition,))
+      script.Print(" ")
+      script.Print("Verified Bliss System files...")
 
     if partition == "system":
       code = ErrorCode.SYSTEM_UNEXPECTED_CONTENTS
